@@ -1,7 +1,9 @@
 import sys
 from serial.tools import list_ports
 
-KNOWN_VIDS = {0x303A, 0x10C4, 0x1A86, 0x0403}
+ESPRESSIF_VID = 0x303A
+CDC_PID = 0x80C2
+BOOTLOADER_PID = 0x0002
 
 def ports():
     return list(list_ports.comports())
@@ -9,7 +11,9 @@ def ports():
 if __name__ == "__main__":
     found = ports()
     if len(sys.argv) > 1 and sys.argv[1] == "detect":
-        candidates = [p for p in found if p.vid in KNOWN_VIDS]
+        candidates = [p for p in found if p.vid == ESPRESSIF_VID and p.pid == CDC_PID]
+        if not candidates:
+            candidates = [p for p in found if p.vid == ESPRESSIF_VID and p.pid == BOOTLOADER_PID]
         if len(candidates) == 1:
             print(candidates[0].device)
         else:
